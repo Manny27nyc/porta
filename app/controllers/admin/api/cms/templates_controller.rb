@@ -129,7 +129,7 @@ class Admin::Api::CMS::TemplatesController < Admin::Api::CMS::BaseController
   end
 
   def cms_template_params
-    attrs = params[:template] || {}
+    attrs = params[:template].permit! || {}
 
     set_layout_by(:layout_name, :find_by_system_name, attrs)
     set_layout_by(:layout_id, :find_by_id, attrs)

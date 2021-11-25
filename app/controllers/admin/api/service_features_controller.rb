@@ -104,7 +104,7 @@ class Admin::Api::ServiceFeaturesController < Admin::Api::ServiceBaseController
   protected
 
   def feature_params
-    params.fetch(:feature)
+    params.require(:feature).permit(%i[name description scope])
   end
 
   def features

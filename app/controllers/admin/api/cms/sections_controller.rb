@@ -45,8 +45,9 @@ class Admin::Api::CMS::SectionsController < Admin::Api::CMS::BaseController
   ##=    }
   ##=  }
   def create
-    parent_id = params[:section].delete(:parent_id)
-    @section = current_account.sections.build(params[:section])
+    section_param = section_params
+    parent_id = section_param.delete(:parent_id)
+    @section = current_account.sections.build(section_param)
 
     if current_account.sections.exists?(id: parent_id)
       @section.parent_id = parent_id
@@ -72,7 +73,7 @@ class Admin::Api::CMS::SectionsController < Admin::Api::CMS::BaseController
   ##=       section_model_params
   ##=     }
   def update
-    @section.update_attributes(params[:section])
+    @section.update(section_params)
     respond_with @section
   end
 
@@ -91,9 +92,14 @@ class Admin::Api::CMS::SectionsController < Admin::Api::CMS::BaseController
   end
 
   private
-    def find_section
-      @section = current_account.sections.find_by_id(params[:id]) || current_account.sections.find_by_system_name(params[:id])
 
-      raise ActiveRecord::RecordNotFound.new("Couldn't find CMS::Section with id or system_name=#{params[:id]}") if @section.nil?
-    end
+  def section_params
+    params.require(:section).permit!
+  end
+
+  def find_section
+    @section = current_account.sections.find_by(id: params[:id]) || current_account.sections.find_by(system_name: params[:id])
+
+    raise ActiveRecord::RecordNotFound, "Couldn't find CMS::Section with id or system_name=#{params[:id]}" unless @section
+  end
 end
